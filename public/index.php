@@ -61,8 +61,8 @@ try {
             <?php 
             foreach($categories as $category) {
             ?>
-                    <h2 class="header" data-id="<?= str_replace(' & ', '', $category) ?>"><?= $category ?></h2>
-                    <div class="list" id="<?= str_replace(' & ', '', $category) ?>">
+                    <h2 class="header" data-id="<?= $category ?>"><?= $category ?></h2>
+                    <div class="list" id="<?= $category ?>">
             <?php
                     foreach($items[$category] as $item) {
             ?>
