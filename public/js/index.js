@@ -1,13 +1,31 @@
 
 
-
 $(document).ready(function() {
 
+    $(".list").each(function(index) {
+        if($(this).attr('id') != "random-deposit") {
+            $(this).toggle().toggleClass("hide");
+        }
+    });
 
     $("h2").click(function() {
+        
+        
         let id =  $(this).data("id");
-        $("#" + id).toggle();
-        $("#" + id).toggleClass("hide");
+        let element = $("#" + id);
+        element.toggle();
+        element.toggleClass("hide");
+
+        let child = $(this).children()[0];
+        
+        if($(child).text().includes("expand_more")) {
+            $(child).text("expand_less")
+        }
+        else 
+        {
+            $(child).text("expand_more")
+        }
+
     })
 
 

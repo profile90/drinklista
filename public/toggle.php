@@ -26,3 +26,5 @@ if(!empty($row)) {
     die(json_encode(['response' => "", 'error' => "No such product found."]));
 }
 
+die("Lol wtf.");
+

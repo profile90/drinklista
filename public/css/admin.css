@@ -1,0 +1,128 @@
+* {
+
+    font-family: "Roboto";
+}
+
+
+#form-wrapper {
+    background: #2c2c2c;
+    margin: 20px 50px;
+    padding: 30px;
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: center;
+    justify-items: center;
+    border-radius: 5px;
+}
+
+
+
+
+#add {
+
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1.5fr auto 3fr;
+    grid-template-areas: 
+            "name name name name"
+            "internal_prize member_prize external_prize alcohol_content"
+            "internal member external percent"
+            "stock stock new new"
+            "category category category category "
+            "submit submit submit submit";
+    grid-gap: 10px;
+}
+
+input, select {
+    border: unset;
+    border-radius: 5px;
+    color: white;
+    background: #161616;
+}
+
+input[type="number"] {
+    font-size: 20px;
+    text-align: center;
+}
+
+fieldset {
+    border: none;   
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+fieldset > * {
+    padding: 5px;
+}
+
+label {
+    align-self: center;
+    justify-self: center;
+}
+
+#name {
+    grid-area: name;
+    background: #161616;
+    color: white;
+    padding: 10px;
+}
+
+#internal_prize {
+    grid-area: internal_prize;
+    background: #E0BD64;
+}
+#member_prize {
+    grid-area: member_prize;
+    background: #E0BD6474;
+}
+#external_prize {
+    grid-area: external_prize;
+    background: #E0BD641A;
+}
+#alcohol_content {
+    color: white;
+    grid-area: alcohol_content;
+}
+
+
+#internal {
+    grid-area: internal;
+}
+
+#member {
+    grid-area: member;
+
+}
+
+#external {
+    grid-area: external;
+}
+
+#percent {
+    grid-area: percent;
+}
+
+#stock {
+    grid-area: stock;
+}
+
+#new {
+    grid-area: new;
+}
+
+#category {
+    grid-area: category;
+    padding: 5px;
+    /*background: */
+}
+
+#submit {
+    grid-area: submit;
+    color: white;
+    padding: 30px;
+}
+
+#submit:hover {
+    background: #E0BD64;
+}
