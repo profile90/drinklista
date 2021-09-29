@@ -1,11 +1,40 @@
 
-td {
 
-    font-weight: 200;
-    padding-top: 4px;
-    padding-bottom: 4px;
+
+#itemTable {
+    margin: 0 auto;
+    width: 50%;
+}
+
+th  {
+    text-align: left;
 }
 
 tr {
+
     width: 100%;
+}
+
+td, th {
+    padding-right: 10px;
+}
+
+th:nth-child(2) {
+    text-align: right;
+}
+
+td {
+    text-align: center;
+}
+
+td:nth-child(2) {
+    text-align: right;
+}
+
+.error {
+    background: red;
+}
+
+h1 {
+    text-align: center;
 }

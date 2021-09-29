@@ -23,6 +23,7 @@ $query = "
 
 $rows = [];
 
+
 try {
     $pdoparam = [
         PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8",
@@ -57,12 +58,15 @@ try {
         $drinks[$row['name']]['item'] = $row;
         $drinks[$row['name']][$row['alcohol_name']] = $row;
     }
+
 /*
     print_r($drink_rows);
     echo '<br>';
     echo '<br>';
     print_r($drinks);
 */
+
+
 } catch (Exception $e) {
 
     die($e->getMessage());
@@ -99,19 +103,19 @@ try {
             <input id="search" placeholder="Jag vet jag vill ha." type="search"></input>
 
 <!--
-            <h2 class="header" data-id="">
+            <h2 class="header" data-id="drinks">
                 Drinks
                 <span class="material-icons"> 
                     expand_less
                 </span>
             </h2>
-
+-->
             <?php 
             
             foreach($drinks as $key => $row) {
                
             ?>
-            <div class="list">
+            <div class="list special">
                 <div id="<?= $row[$key]['id'] ?>" class="item">
                     <span class="percent"></span>
                     <span class="name"><?= $key ?></span>
@@ -138,10 +142,10 @@ try {
             ?>
                 </div>
             </div>
+
             <?php
             }
             ?>
--->
 
             <?php 
             foreach($categories as $category) {
@@ -171,7 +175,7 @@ try {
                         </div>
                 
             <?php 
-                }
+                    }
             ?>
                     </div>
             <?php 

@@ -2,11 +2,7 @@
 
 $(document).ready(function() {
 
-    $(".list").each(function(index) {
-        if($(this).attr('id') != "random-deposit") {
-            $(this).toggle().toggleClass("hide");
-        }
-    });
+
 
     $("h2").click(function() {
         
@@ -19,22 +15,33 @@ $(document).ready(function() {
         let child = $(this).children()[0];
         
         if($(child).text().includes("expand_more")) {
-            $(child).text("expand_less")
+            $(child).text("expand_less");   
         }
         else 
         {
-            $(child).text("expand_more")
+            $(child).text("expand_more");
         }
 
     })
 
 
-    $("#search").on("keyup", function() {
+    function hide() {
+        $(".list").each(function(index) {
+            if($(this).attr('id') != "random-deposit") {
+                console.log("Hiding or showing from hide()")
+                $(this).toggle().toggleClass('hide');
+            }
+        });
+    }
+    
 
+    $("#search").on("keyup", function() {
+        
         let value = $(this).val().toLowerCase();
 
         $(".item").filter(function() {
-            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+            console.log($(this).parent()); 
         });
     });
 

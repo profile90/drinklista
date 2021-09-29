@@ -20,6 +20,8 @@ body {
     text-align: center;
 }
 
+
+
 .wrapper {
     display: grid;
     grid-template-columns: 1fr;
@@ -158,4 +160,8 @@ span.material-icons {
 
 .thin {
     font-weight: 200;
+}
+
+.special > .item    {
+    margin-top: 30px;
 }

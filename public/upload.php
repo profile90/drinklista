@@ -25,21 +25,97 @@
             </form>
         </table>
 
-
-
-    </body>
-
-</html>
-
-
-
 <?php
 
-if ( isset($_POST["submit"]) ) {
+/*
+    FUNCTIONS
+*/
 
-    if ( isset($_FILES["file"])) {
+
+
+function csv_to_array($filename='', $delimiter=',')
+{
+    if(!file_exists($filename) || !is_readable($filename))
+        return FALSE;
+
+    $header = NULL;
+    $data = array();
+    if (($handle = fopen($filename, 'r')) !== FALSE)
+    {
+        while (($row = fgetcsv($handle, 1000, $delimiter)) !== FALSE)
+        {
+            if(!$header)
+                $header = $row;
+            else
+                $data[] = array_combine($header, $row);
+        }
+        fclose($handle);
+    }
+    return $data;
+}
+
+
+function missingData($item) 
+{    
+   return $item == "";
+} 
+
+
+function format($data, $headers)
+{
+   echo "<table id=\"itemTable\">";
+   echo '<thead>';
+   echo '<tr>';
+   echo '<th> Number </th>';
+   foreach($headers as $header) 
+   {    
+       echo "<th>" . $header . "</th>";
+   }
+   echo '</tr>';
+   echo '</thead>';
+
+   foreach($data as $key => $row) 
+   {
+
+       if(array_filter($row, "missingData")) 
+       {
+           echo '<tr class="error"><td>' . ($key + 1) . '</td><td> Saknar information </td></tr>';
+           continue;
+       }
+
+
+       echo "<tr>";
+       echo '<td>' . ($key + 1) . '</td>';
+       foreach($row as $item) 
+       {    
+           $class = "";
+           
+           if(strpos($item, "kr")) 
+           {
+               $class = "error";
+           }
+           
+           echo "<td class=\"" . $class  . "\">" . $item . "</td>";
+       }
+       echo "</tr>";
+   }
+   echo "</table>";
+}
+
+
+/**
+ * Make sure the fileupload is a valid .csv file.
+ * 
+ */
+
+
+if ( isset($_POST["submit"]) ) 
+{
+
+    if ( isset($_FILES["file"])) 
+    {
  
-             //if there was an error uploading the file
+        //if there was an error uploading the file
         if ($_FILES["file"]["error"] > 0) 
         {
             echo "Return Code: " . $_FILES["file"]["error"] . "<br />";
@@ -48,22 +124,12 @@ if ( isset($_POST["submit"]) ) {
         {
             //Print file details
             echo "Upload: " . $_FILES["file"]["name"] . "<br />";
-            echo "Type: " . $_FILES["file"]["type"] . "<br />";
-            echo "Size: " . ($_FILES["file"]["size"] / 1024) . " Kb<br />";
-            echo "Temp file: " . $_FILES["file"]["tmp_name"] . "<br />";
+            echo "Size: " . (floor($_FILES["file"]["size"] / 1024)) . " Kb<br />";
 
-            //if file already exists
-            if (file_exists("upload/" . $_FILES["file"]["name"])) 
-            {
-                echo $_FILES["file"]["name"] . " already exists. ";
-            }
-            else 
-            {
-                    //Store file in directory "upload" with the name of "uploaded_file.txt"
-                $storagename = "meny.csv";
-                move_uploaded_file($_FILES["file"]["tmp_name"], "upload/" . $storagename);
-                echo "Stored in: " . "upload/" . $_FILES["file"]["name"] . "<br />";
-            }
+            //Store file in directory "upload" with a time stamp, titled 'YYYY_MM_DD_H_Mi_S_meny.csv'
+            $storagename = date("Y_m_d_h_i_s") ."_meny.csv";
+            move_uploaded_file($_FILES["file"]["tmp_name"], "upload/" . $storagename);
+            echo "Stored in: " . "upload/" . $storagename . "<br />";
         }
     } 
     else 
@@ -71,64 +137,104 @@ if ( isset($_POST["submit"]) ) {
         echo "No file selected <br />";
     }
  }
- function csv_to_array($filename='', $delimiter=',')
- {
-     if(!file_exists($filename) || !is_readable($filename))
-         return FALSE;
- 
-     $header = NULL;
-     $data = array();
-     if (($handle = fopen($filename, 'r')) !== FALSE)
-     {
-         while (($row = fgetcsv($handle, 1000, $delimiter)) !== FALSE)
-         {
-             if(!$header)
-                 $header = $row;
-             else
-                 $data[] = array_combine($header, $row);
-         }
-         fclose($handle);
-     }
-     return $data;
- }
+
+
+ /**
+  * Find the uploaded file, and parse it.
+  */
+
+
+  // Make sure the file exists
 
  if ( isset($storagename) && $file = fopen( "upload/" . $storagename , "r" ) ) 
  {
-  
-    
+
+
     $array = array_map('str_getcsv', file('upload/'. $storagename));
-
     $header = array_shift($array);
-    
-    array_walk($array, '_combine_array', $header);
-    
-    function _combine_array(&$row, $key, $header) {
-      $row = array_combine($header, $row);
-    }
-    
     $data = [];
-    foreach($array as $key => $row) {
+
+    $errors = false;
+    foreach($array as $key => $row) 
+    {
         $data[$key] = [];
-        foreach($row as $itemKey => $item) {
-            $data[$key][":" . $header[$itemKey]] = $item;
-        }
-        print_r($data[$key]);
-        echo '<br>';
-        echo '<br>';
-        echo '<br>';
+
+
+        foreach($row as $itemKey => $item) 
+        {
+            // Check if anything is missing.
+            if($item == "" || strpos($item, "kr")) 
+            {
+                $errors = true;
+            }
+
+            $data[$key][$header[$itemKey]] = $item;
+        }    
     }
 
+    if($errors) 
+    {
+        echo '<h1> Du har fel i listan, gör om och gör rätt. </h1>';
+    }
+    else 
+    {
+        try 
+        {        
+        
+            $pdoparam = [
+                PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8",
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+            ];
+            
+            $db = new PDO('mysql:host=localhost;dbname=drinklista','list','diskkm', $pdoparam);
+            
 
+            $query = '
+                INSERT INTO list
+                VALUES 
+                (
+                 DEFAULT,
+                 :name,           
+                 :category,       
+                 :alcohol_content,
+                 :external_prize, 
+                 :internal_prize, 
+                 :in_stock,       
+                 :new,            
+                 :member_prize)
+            ';
 
+            $db->beginTransaction();
 
-/* 
-    print_r($header);
-    echo '<br>';
-    echo '<br>';
-    echo '<br>';
-    print_r($array);
-*/
+            $delete = $db->prepare("DELETE FROM list");
+            $delete->execute();
 
- }
+            $stmnt = $db->prepare($query);
+
+            foreach($data as $row) {
+                $stmnt->execute($row);
+            }
+
+            $db->commit();
+
+            echo '<h1> Hurra! Du har nu lagt till: </h1>';
+
+        }
+        catch(Exception $e) 
+        {
+            $db->rollback();
+            echo '<h1> Du har fel någonstans, kontakta teknikansvarig</h1>';
+            echo '<div class="error">' . $e->getMessage() . '</div>';
+        }
+
+        format($data, $header);    
+    }
+}
 
 ?>
+
+
+</body>
+
+</html>
